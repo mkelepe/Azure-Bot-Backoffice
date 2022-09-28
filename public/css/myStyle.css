@@ -1,0 +1,40 @@
+.myContactIcons {
+  color: white;
+  font-size: 20px;
+  float: left;
+  width: 44px;
+  height: 44px;
+  background: #00bfd8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  transition: all 0.3s ease-in-out;
+}
+
+.myLittlePadding{
+  padding: 0 0 0 60px;
+}
+
+.myButtonRem {
+  max-width: 31rem;
+}
+
+.myCenter {
+  margin: auto;
+  /* width: 50%; */
+  padding: 10px;
+}
+
+.myClickable {
+  cursor: pointer;
+}
+
+.myHidden {
+  display: none;
+}
+
+.myFixedColumn {
+  word-wrap: break-word;
+  max-width: 150px;
+}
