@@ -10,8 +10,10 @@
   "author": "Marios Kelepeshis",
   "license": "ISC",
   "dependencies": {
+    "azure-ad-verify-token": "^2.0.1",
     "dotenv": "^10.0.0",
     "express": "^4.18.1",
+    "jwt-decode": "^3.1.2",
     "node-fetch": "^2.6.7",
     "pg": "^8.8.0"
   }
