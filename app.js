@@ -6,32 +6,6 @@ const fetch = require('node-fetch');
 const Pool = require('pg').Pool;
 const jwt_decode = require('jwt-decode');
 
-// import { verify, VerifyOptions } from 'azure-ad-verify-token';
-let tokenVerify;
-const dynamicImports= async () => {
-  const {verify,} = await import('azure-ad-verify-token');
-  tokenVerify= verify;
-}
-// dynamicImports().then(()=>{
-//   const options = {
-//     jwksUri: 'https://login.microsoftonline.com/common/discovery/keys',
-//     issuer: 'https://login.microsoftonline.com/d00244c0-5012-477e-a93b-96150bb780cf/v2.0',
-//     audience: '42f7b561-1c6f-451f-b1f0-ae82cd705e02',
-//   };
-
-//   const token= `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjJaUXBKM1VwYmpBWVhZR2FYRUpsOGxWMFRPSSJ9.eyJhdWQiOiI0MmY3YjU2MS0xYzZmLTQ1MWYtYjFmMC1hZTgyY2Q3MDVlMDIiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vZDAwMjQ0YzAtNTAxMi00NzdlLWE5M2ItOTYxNTBiYjc4MGNmL3YyLjAiLCJpYXQiOjE2NjYxNDMxMTIsIm5iZiI6MTY2NjE0MzExMiwiZXhwIjoxNjY2MTQ3MDEyLCJuYW1lIjoiTWFyaW9zIERlbGVnYXRlZCIsIm9pZCI6IjAwNTZjYTUxLTgwNjgtNDAwMS1hNjQzLWJkNTk5NDYxYzgxYiIsInByZWZlcnJlZF91c2VybmFtZSI6ImRlbGVnYXRlZF91c2VyQGN5cHJ1czMzOC5vbm1pY3Jvc29mdC5jb20iLCJyaCI6IjAuQVhvQXdFUUMwQkpRZmtlcE81WVZDN2VBejJHMTkwSnZIQjlGc2ZDdWdzMXdYZ0o2QU1vLiIsInN1YiI6IlRnZGlaTHFBMjZNelJOU2h5clo4ZUJJa2c1bGRZVUhRYXE3RUVWMlpQYkEiLCJ0aWQiOiJkMDAyNDRjMC01MDEyLTQ3N2UtYTkzYi05NjE1MGJiNzgwY2YiLCJ1dGkiOiJqamRtTU90SWdrbVNESlgwNmhsQkFBIiwidmVyIjoiMi4wIn0.Rv4YO_lt2mKRNNqsrKAGTKiXAeNV9Q0Rze0mK8aS1AWMI10JJx09tWF-fcCBczWfJ-vW9RW7s-eyE7mnjf87tQapbEN540HxL431GqT4UYt_ThD-delZGFF3ulJM1vLwiMcVzlDspSy911aKoC7HTQhaCPzjMKV8PXMKc3SJaYxGBf2J1BsLDeNBTvUjY0r_PBWgeqtCFtlx-mKTAm3EX_snpJ-sMS0wk0scVOQkAfo8wvYDC5H5TuwAF1E1L5lbOltEU_s0vGUtqqGKZDSlK8v6l47aZdY-Kyj-2XlKQsgNZRUw5VAeQZCfM-Z7kA-cd7J8oIfTW13c0Zk6N-uwJg`;
-
-//   tokenVerify(token, options)
-//   .then((decoded) => {
-//     // verified and decoded token
-//     console.log(decoded);
-//   })
-//   .catch((error) => {
-//     // invalid token
-//     console.error(error);
-//   });
-// });
-
 
 const pool = new Pool({
     host: process.env.DB_HOST,
@@ -130,37 +104,9 @@ const getNewMeeting= async function () {
   return {meeting_id, meeting_url}
 }
 
-const authenticateUser= async function (email, password) {
-  const REQ_URL = `https://login.microsoftonline.com/organizations/oauth2/v2.0/token`;
-
-  const REQ_HEADERS = {
-    "Content-Type": "application/x-www-form-urlencoded"
-  };
-  
-  const urlencoded = new URLSearchParams();
-  urlencoded.append("grant_type", "password");
-  urlencoded.append("client_id", process.env.CLIENT_ID);
-  urlencoded.append("scope", "user.read openid profile offline_access");
-  urlencoded.append("client_secret", process.env.CLIENT_SECRET);
-  urlencoded.append("username", email);
-  urlencoded.append("password", password);
-
-  const res = await fetch(REQ_URL, {
-    method: 'POST',
-    headers: REQ_HEADERS,
-    body: urlencoded,
-    redirect: 'follow'
-  })
-    // .then(response => response.text())
-    .then(response => response.json())
-    .catch(error => console.log(error));
-
-  return res;
-}
-
 const verifyUserToken= function (token) {
   const decoded = jwt_decode(token);
-  if (decoded.aud && decoded.aud == process.env.CLIENT_ID){
+  if (decoded.appid && decoded.appid == process.env.CLIENT_ID){
     return true;
   } else {
     return false;
@@ -169,18 +115,13 @@ const verifyUserToken= function (token) {
 
 const getEmailFromToken= function (token) {
   const decoded = jwt_decode(token);
-  if (decoded.preferred_username){
-    return decoded.preferred_username;
+  if (decoded.upn){
+    return decoded.upn;
   } else {
     return null;
   }
 }
 
-// getToken().then((res)=>{
-//   createOnlineMeeting(res.access_token).then((res)=>{
-//     console.log(res);
-//   })
-// })
 
 const app = express();
 
@@ -288,6 +229,8 @@ app.post('/api/create-meeting/', async (req, res) => {
       throw("Error: Παρακαλώ συμπληρώστε όλα τα πεδία με *");
     }
 
+    // Implement form validation
+
     const client= await pool.connect()
     let resDB;
     try {
@@ -348,69 +291,17 @@ app.post('/api/create-meeting/', async (req, res) => {
   }
 });
 
-app.get('/api/get-current-queue/', async (req, res) => {
-  try {
-    const client= await pool.connect()
-    try {
-      let resDB = await client.query(`
-        select count(*) as mycount
-        from public.meeting m 
-        where m.status = 'requested' or m.status = 'accepted';
-      `);
-
-      const count= resDB['rows'][0]['mycount'];
-      res.status(200).send({
-        'currentQueue': count
-      }).end();
-
-    } catch (error) {
-      throw error
-
-    } finally {
-      await client.release()
-    }
-
-  } catch (error) {
-    console.log(error);
-    res.status(400).send(error).end();
-  }
-});
-
-app.post('/api/auth/', async (req, res) => {
-  try {
-    const email= req.body['email'] || "";
-    const password= req.body['password'] || "";
-
-    if (email== "" || password== ""){
-      throw("Error: Παρακαλώ συμπληρώστε όλα τα πεδία.");
-    }
-
-    const authRes= await authenticateUser (email, password);
-    if (authRes.error){
-      throw("Error: Αποτυχία ταυτοποίησης. Παρακαλώ δοκιμάστε ξανά.");
-    }
-
-    const token_email= getEmailFromToken(authRes.id_token);
-
-    res.status(200).send({
-      'token': authRes.id_token,
-      'email': token_email
-    }).end();
-
-  } catch (error) {
-    console.log(error);
-    res.status(400).send(error).end();
-  }
-});
 
 app.post('/api/verify/', async (req, res) => {
   try {
     const token= req.body['token'] || "";
 
     const verified= verifyUserToken(token);
+    const email= getEmailFromToken(token);
 
     res.status(200).send({
-      'verified': verified
+      'verified': verified,
+      'email': email,
     }).end();
 
   } catch (error) {

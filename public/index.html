@@ -21,44 +21,21 @@
 <body data-spy="scroll" data-target=".fixed-top">
 
   <div class="w3-container w3-teal">
-    <h1 id="titleSignIn">GR Gov ACS</h1>
-    <h1 id="titleHome" class="myHidden">Αιτήματα κλήσεων</h1>
+    <h1 id="titleHome" class="">Αιτήματα κλήσεων</h1>
     <h1 id="titleSettings" class="myHidden">Ρυθμίσεις</h1>
-    <a id="buttonScreenToogle" class="myHidden topRight w3-block w3-round-large w3-hover-yellow myClickable w3-grey svgButton">
+    <a id="buttonScreenToogle" class="topRight w3-block w3-round-large w3-hover-yellow myClickable w3-grey svgButton">
       <img id="buttonHome" class="myHidden" alt="Home" src="images/home.svg" />
       <img id="buttonSettings" alt="Settings" src="images/settings.svg" />
     </a>
-    <a id="buttonSignOutToogle" class="myHidden topNextRight w3-block w3-round-large w3-hover-red myClickable w3-grey svgButton">
+    <a id="buttonSignOutToogle" class="topNextRight w3-block w3-round-large w3-hover-red myClickable w3-grey svgButton">
       <img id="buttonLogOut" class="" alt="LogOut" src="images/logout.svg" />
     </a>
   </div>
 
   <br>
 
-  <div id="screenSignIn" class="w3-container">
 
-    <div class="w3-card-4">
-      <div class="w3-container w3-green">
-        <h2>Είσοδος Χρήστη</h2>
-      </div>
-  
-      <form class="w3-container">
-        <p></p>
-        <label>Email</label>
-        <input id="inputEmail" class="w3-input" type="email">
-        <p></p>
-        <label>Password</label>
-        <input id="inputPassword" class="w3-input" type="password">
-        <p></p>
-        <br>
-        <button id="buttonSignIn" class="w3-xlarge w3-round w3-hover-grey myClickable w3-black" type="button">Sign-In</button>
-        <p></p>
-      </form>
-    </div>
-
-  </div>
-
-  <div id="screenHome" class="myHidden w3-container">
+  <div id="screenHome" class="w3-container">
 
     <div class="w3-responsive">
       <table id="tableMeetings" class="w3-table-all w3-small">
@@ -118,8 +95,7 @@
 
   <script src="js/myScript.js"></script>
   <script type="text/javascript" src="https://alcdn.msauth.net/browser/2.30.0/js/msal-browser.min.js"></script>
-  <!-- <script src="js/msal-auth.js"></script> -->
-  <script src="js/auth.js"></script>
+  <script src="js/msal-auth.js"></script>
 
 </body>
 

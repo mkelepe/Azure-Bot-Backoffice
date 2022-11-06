@@ -1,20 +1,18 @@
 const msalConfig = {
     auth: {
-        clientId: '8937fd89-13f0-493c-8f6e-4c0224dfdfed'
-    }
+        clientId: "42f7b561-1c6f-451f-b1f0-ae82cd705e02",
+        authority: "https://login.microsoftonline.com/d00244c0-5012-477e-a93b-96150bb780cf",
+      }
 };
 
 const msalInstance = new msal.PublicClientApplication(msalConfig);
-let myAccessToken;
 
-const a = async () => {
+const authenticate = async () => {
     const redirectResponse = await msalInstance.handleRedirectPromise();
     if (redirectResponse !== null) {
-        // Acquire token silent success
         let accessToken = redirectResponse.accessToken;
-        // Call your API with token
-        myAccessToken = accessToken;
-        console.log(accessToken);
+        // console.log(accessToken);
+        verifyToken(accessToken);
     } else {
         // MSAL.js v2 exposes several account APIs, logic to determine which account to use is the responsibility of the developer
         const account = msalInstance.getAllAccounts()[0];
@@ -27,19 +25,22 @@ const a = async () => {
         msalInstance
             .acquireTokenSilent(accessTokenRequest)
             .then(function (accessTokenResponse) {
-                // Acquire token silent success
-                // Call API with token
                 let accessToken = accessTokenResponse.accessToken;
-                // Call your API with token
-                myAccessToken = accessToken;
-                console.log(accessToken);
+                // console.log(accessToken);
+                verifyToken(accessToken);
             })
             .catch(function (error) {
                 // msalInstance["browserStorage"].clear();
-                msalInstance.loginRedirect({
-                    redirectUri: "http://localhost:5501/"
-                });
+                msalInstance.loginRedirect();
             });
     }
 };
-a();
+
+const logout = async () => {
+    const logoutRequest = {
+        account: msalInstance.getAccountByHomeId(),
+    };
+    msalInstance.logoutRedirect(logoutRequest);
+}
+
+authenticate();

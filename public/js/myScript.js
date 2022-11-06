@@ -3,58 +3,8 @@ window.myState.isCurrentScreenHome= true;
 
 const BACKEND_HOST= '';
 
-const authenticate= async function (email, password) {
-    const REQ_URL = `${BACKEND_HOST}/api/auth/`;
 
-    const REQ_HEADERS = {
-      "Content-Type": "application/json"
-    };
-    
-    const REQ_BODY = JSON.stringify({
-      "email": email,
-      "password": password,
-    });
-  
-    const res = await fetch(REQ_URL, {
-      method: 'POST',
-      headers: REQ_HEADERS,
-      body: REQ_BODY,
-      redirect: 'follow'
-    })
-    //   .then(response => response.text())
-    // //   .then(response => response.json())
-    //   .catch(error => console.log(error));
-  
-      return res;
-}
-
-document.getElementById('buttonSignIn').onclick= async () => {    
-    const inputEmail= document.getElementById('inputEmail');
-    const inputPassword= document.getElementById('inputPassword');
-
-    const authRes= await authenticate(inputEmail.value, inputPassword.value);
-    inputPassword.value= '';
-
-    if (authRes.status== 200){
-        const {token, email}= await authRes.json();
-        sessionStorage.setItem("token", token);
-        sessionStorage.setItem("email", email);
-        document.getElementById('titleSignIn').classList.add('myHidden');
-        document.getElementById('screenSignIn').classList.add('myHidden');
-        document.getElementById('titleHome').classList.remove('myHidden');
-        document.getElementById('screenHome').classList.remove('myHidden');
-        document.getElementById('buttonScreenToogle').classList.remove('myHidden');
-        document.getElementById('buttonSignOutToogle').classList.remove('myHidden');
-    } else{
-        alert(await authRes.text());
-    }
-}
-
-window.onload= async function () {
-    const token= sessionStorage.getItem("token");
-    if (!token){
-        return;
-    }
+const verifyToken= async (token) => {
 
     const REQ_URL = `${BACKEND_HOST}/api/verify/`;
 
@@ -75,14 +25,12 @@ window.onload= async function () {
     //   .then(response => response.text())
       .then(response => response.json())
       .catch(error => console.log(error));
+
+      // console.log(res);
   
       if (res.verified){
-        document.getElementById('titleSignIn').classList.add('myHidden');
-        document.getElementById('screenSignIn').classList.add('myHidden');
-        document.getElementById('titleHome').classList.remove('myHidden');
-        document.getElementById('screenHome').classList.remove('myHidden');
-        document.getElementById('buttonScreenToogle').classList.remove('myHidden');
-        document.getElementById('buttonSignOutToogle').classList.remove('myHidden');
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("email", res.email);
       } else{
         sessionStorage.clear();
         return;
@@ -140,7 +88,7 @@ document.getElementById('buttonScreenToogle').onclick= () => {
 
 document.getElementById('buttonSignOutToogle').onclick= () => {    
     sessionStorage.clear();
-    location.reload();
+    logout();
 }
 
 document.getElementById('buttonSettingsSave').onclick= async () => {
@@ -167,9 +115,13 @@ document.getElementById('buttonSettingsSave').onclick= async () => {
         body: REQ_BODY,
         redirect: 'follow'
       })
-      .then(response => response.text())
-    //   .then(response => response.json())
       .catch(error => console.log(error));
+
+      if (res.status== 200){
+        alert('Ρυθμίσεις ανανεώθηκαν επιτυχώς.')
+      } else{
+        alert('Error: Οι ρυθμίσεις δεν ανανεώθηκαν!');
+      }
 
 }
 
