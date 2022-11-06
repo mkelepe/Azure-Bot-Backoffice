@@ -115,8 +115,8 @@ const verifyUserToken= function (token) {
 
 const getEmailFromToken= function (token) {
   const decoded = jwt_decode(token);
-  if (decoded.upn){
-    return decoded.upn;
+  if (decoded.unique_name){
+    return decoded.unique_name;
   } else {
     return null;
   }
