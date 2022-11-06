@@ -87,7 +87,6 @@ document.getElementById('buttonScreenToogle').onclick= () => {
 }
 
 document.getElementById('buttonSignOutToogle').onclick= () => {    
-    sessionStorage.clear();
     logout();
 }
 
