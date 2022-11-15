@@ -275,8 +275,72 @@ app.post('/api/create-meeting/', async (req, res) => {
       
 
       res.status(200).send({
-        "meeting_url" : meeting_url
+        "meeting_id" : meeting_id
       }).end();
+
+    } catch (error) {
+      throw error
+
+    } finally {
+      await client.release()
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error).end();
+  }
+});
+
+app.post('/api/check-meeting-request/', async (req, res) => {
+  try {
+    const meeting_id= req.body['meeting_id'] || "";
+
+    if (meeting_id== ""){
+      throw("Error: Παρακαλώ συμπληρώστε το meeting_id");
+    }
+
+    const client= await pool.connect()
+    let resDB;
+    try {
+
+      resDB = await client.query(`
+      select *
+      from public.meeting m 
+      where m.meeting_id = $1;
+      `,
+      [meeting_id, ]);
+
+      if (resDB['rows'].length== 0) {
+        throw("Error: Παρακαλώ συμπληρώστε με έγκυρο meeting_id");
+      }
+
+      // console.log(resDB['rows'][0]['id']);
+
+      const status= resDB['rows'][0]['status'];
+      const meeting_url= resDB['rows'][0]['meeting_url'];
+      const reject_reason= resDB['rows'][0]['reject_reason'];
+      const form_name= resDB['rows'][0]['form_name'];
+
+      if (status== 'accepted'){
+        const acs_meeting_url= process.env.ACS_APP_URL + '/?teamsLink=' + encodeURIComponent(meeting_url) + '&name=' + encodeURIComponent(form_name);
+
+        res.status(200).send({
+          "status": status,
+          "acs_meeting_url" : acs_meeting_url
+        }).end();
+
+        return;
+      }
+
+      if (status== 'rejected'){
+        res.status(200).send({
+          "status": status,
+          "reject_reason" : reject_reason
+        }).end();
+
+        return;
+      }
+      
 
     } catch (error) {
       throw error
