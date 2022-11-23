@@ -256,7 +256,7 @@ app.post('/api/create-meeting/', async (req, res) => {
         where m.status = 'requested' or m.status = 'accepted';
       `);
 
-      const currentQueue= Number(resDB['rows'][0]['mycount']);
+      const currentQueue= Number(resDB['rows'][0]['mycount']) + 1;
 
 
       if (currentQueue > maxWaitingQueue){
